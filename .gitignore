@@ -1,0 +1,8 @@
+__pycache__/
+*.pyc
+# makepkg output
+pkg/src/
+pkg/pkg/
+pkg/howdy/
+pkg/*.pkg.tar.*
+pkg/*.log
