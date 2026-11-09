@@ -6,3 +6,6 @@ pkg/pkg/
 pkg/howdy/
 pkg/*.pkg.tar.*
 pkg/*.log
+pkg/*.bz2
+pkg/*.dat
+pkg/px13-ir-camera-fix/
