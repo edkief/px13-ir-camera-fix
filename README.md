@@ -81,3 +81,7 @@ python3 msxu_reader.py --frames 30 --save /tmp/ir   # standalone capture to PGM 
 - `patches/howdy-msxu-package.patch`: package only (meson install list, config defaults)
 - `pkg/`: Arch package (`howdy-px13-git`)
 - `tools/`: probe scripts used during the investigation
+
+## License
+
+MIT, see [LICENSE](LICENSE). howdy itself is also MIT licensed.
