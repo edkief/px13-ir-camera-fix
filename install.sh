@@ -13,7 +13,10 @@ HOWDY_LIB=${HOWDY_LIB:-/usr/lib/howdy}
 HOWDY_CONF=${HOWDY_CONF:-/etc/howdy/config.ini}
 SRC_DIR=$(cd "$(dirname "$0")" && pwd)
 PATCH="$SRC_DIR/patches/howdy-msxu.patch"
-# Paths in the patch are relative to the howdy source tree (a/howdy/src/...)
+# Optional: fixes a crash in `howdy test` with OpenCV 5. Skipped when cli/test.py
+# was already fixed some other way.
+HIST_PATCH="$SRC_DIR/patches/howdy-test-opencv5-hist.patch"
+# Paths in the patches are relative to the howdy source tree (a/howdy/src/...)
 STRIP=-p3
 PATCHED_FILES=(recorders/video_capture.py cli/test.py)
 
@@ -26,12 +29,16 @@ set_plugin() {
 }
 
 is_patched() {
-	patch -d "$HOWDY_LIB" $STRIP -R --dry-run -s -f < "$PATCH" >/dev/null 2>&1
+	patch -d "$HOWDY_LIB" $STRIP -R --dry-run -s -f < "${1:-$PATCH}" >/dev/null 2>&1
 }
 
 if [[ ${1:-} == --uninstall ]]; then
 	[[ -f $HOWDY_CONF ]] && set_plugin opencv
 	rm -f "$HOWDY_LIB/recorders/msxu_reader.py"
+	# Reverse in the opposite order of install
+	if is_patched "$HIST_PATCH"; then
+		patch -d "$HOWDY_LIB" $STRIP -R -s --no-backup-if-mismatch < "$HIST_PATCH"
+	fi
 	if is_patched; then
 		patch -d "$HOWDY_LIB" $STRIP -R -s < "$PATCH"
 	fi
@@ -53,6 +60,16 @@ else
 	echo "howdy's files differ from what the patch expects (different howdy version?)." >&2
 	echo "Nothing was patched. Check: patch -d $HOWDY_LIB $STRIP --dry-run < $PATCH" >&2
 	exit 1
+fi
+
+if is_patched "$HIST_PATCH"; then
+	:
+elif patch -d "$HOWDY_LIB" $STRIP --dry-run -s -f < "$HIST_PATCH" >/dev/null 2>&1; then
+	# No backup: cli/test.py.orig already holds the pre-install file
+	patch -d "$HOWDY_LIB" $STRIP -s --no-backup-if-mismatch < "$HIST_PATCH"
+	echo "patched cli/test.py for OpenCV 5 (howdy test histogram)"
+else
+	echo "note: skipped OpenCV 5 histogram fix, cli/test.py already differs (fixed locally?)"
 fi
 
 if [[ -f $HOWDY_CONF ]]; then

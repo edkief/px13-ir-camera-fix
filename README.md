@@ -73,6 +73,9 @@ python3 msxu_reader.py --frames 30 --save /tmp/ir   # standalone capture to PGM 
 
 - `msxu_reader.py`: the recorder
 - `patches/howdy-msxu.patch`: howdy changes, used by `install.sh` and the package
+- `patches/howdy-test-opencv5-hist.patch`: fixes a `howdy test` crash with OpenCV 5
+  (`IndexError: invalid index to scalar variable`). Applied by the package; `install.sh`
+  applies it when `cli/test.py` hasn't already been fixed some other way.
 - `patches/howdy-msxu-package.patch`: package only (meson install list, config defaults)
 - `pkg/`: Arch package (`howdy-px13-git`)
 - `tools/`: probe scripts used during the investigation

@@ -44,6 +44,7 @@ pkgver() {
 prepare() {
 	cd "$srcdir/$_pkgbase"
 	patch -Np1 -i "$srcdir/$_fixname/patches/howdy-msxu.patch"
+	patch -Np1 -i "$srcdir/$_fixname/patches/howdy-test-opencv5-hist.patch"
 	patch -Np1 -i "$srcdir/$_fixname/patches/howdy-msxu-package.patch"
 	install -m644 "$srcdir/$_fixname/msxu_reader.py" howdy/src/recorders/msxu_reader.py
 }
