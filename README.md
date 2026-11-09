@@ -34,8 +34,19 @@ cd pkg && makepkg -si
 ```
 
 The shipped `/etc/howdy/config.ini` defaults to the PX13 IR camera and the msxu recorder.
-If you already have a config, pacman keeps it and writes the new defaults to
-`config.ini.pacnew`. Set `recording_plugin = msxu` yourself.
+
+When it replaces `howdy` or `howdy-git`, pacman saves your old config as
+`/etc/howdy/config.ini.pacsave` and installs the new defaults. Your face models in
+`/etc/howdy/models` are not touched. To keep your old settings:
+
+```sh
+sudo mv /etc/howdy/config.ini /etc/howdy/config.ini.pacnew       # keep defaults for reference
+sudo mv /etc/howdy/config.ini.pacsave /etc/howdy/config.ini
+sudo sed -i -E 's/^(recording_plugin\s*=\s*).*/\1msxu/' /etc/howdy/config.ini
+```
+
+If you used `install.sh` before, run `sudo ./install.sh --uninstall` first. Otherwise pacman
+refuses to overwrite the untracked `msxu_reader.py`.
 
 ### Option 2: patch an existing howdy install
 

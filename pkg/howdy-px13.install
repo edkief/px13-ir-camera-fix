@@ -1,6 +1,10 @@
 post_install() {
 	echo '[SETUP] 1. config.ini defaults to the PX13 IR camera and the msxu recorder.'
 	echo '        Check device_path with `v4l2-ctl --list-devices` if howdy cannot find the camera.'
+	if [ -f /etc/howdy/config.ini.pacsave ]; then
+		echo '[NOTE] Your previous config was saved as /etc/howdy/config.ini.pacsave.'
+		echo '       To keep it, move it back and set `recording_plugin = msxu`.'
+	fi
 	echo '[SETUP] 2. Test settings with `sudo howdy test` (debug: `sudo HOWDY_MSXU_DEBUG=1 howdy test`)'
 	echo '[SETUP] 3. Add face model with `sudo howdy add`'
 	echo '[SETUP] 4. Add PAM policy `auth sufficient pam_howdy.so` to e.g. top of `/etc/pam.d/system-auth` (global auth)'
