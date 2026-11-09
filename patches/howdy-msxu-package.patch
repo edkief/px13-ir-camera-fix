@@ -1,0 +1,54 @@
+diff --git a/howdy/src/config.ini b/howdy/src/config.ini
+index 789347a..382629d 100644
+--- a/howdy/src/config.ini
++++ b/howdy/src/config.ini
+@@ -47,7 +47,9 @@ timeout = 4
+ 
+ # The path of the device to capture frames from
+ # Video devices are usually found in /dev/v4l/by-path/
+-device_path = none
++# Default: the ASUS ProArt PX13 IR camera (USB 3277:0059, interface 2).
++# Check with `v4l2-ctl --list-devices` if howdy cannot find it.
++device_path = /dev/v4l/by-path/pci-0000:c4:00.4-usb-0:1:1.2-video-index0
+ 
+ # Print a warning if the the video device is not found
+ warn_no_device = true
+@@ -68,9 +70,24 @@ frame_height = -1
+ # The lower this setting is, the more dark frames are ignored
+ dark_threshold = 60
+ 
+-# The recorder to use. Can be either opencv (default), ffmpeg or pyv4l2.
++# The recorder to use. Can be either opencv, ffmpeg, pyv4l2 or msxu.
+ # Switching from the default opencv to ffmpeg can help with grayscale issues.
+-recording_plugin = opencv
++# msxu is for IR cameras that tag each frame with Microsoft (MSXU) frame
++# illumination metadata, such as the ASUS ProArt PX13 IR camera. It keeps only
++# frames lit by the IR emitter and works around the emitter cut-off.
++recording_plugin = msxu
++
++# MSXU only. Firmware auto exposure metering region as left,top,width,height,
++# or off. Keeps the face exposed when a bright window or lamp is behind it.
++# msxu_roi = 128,60,384,340
++
++# MSXU only. Subtract the neighbouring unlit frame to remove ambient IR.
++# msxu_subtract_ambient = false
++
++# MSXU only. While the camera warms up (msxu_warmup seconds), skip frames with
++# more than this fraction of clipped pixels inside the metering region.
++# msxu_warmup = 1.5
++# msxu_max_saturation = 0.10
+ 
+ # Video format used by ffmpeg. Options include vfwcap or v4l2.
+ # FFMPEG only.
+diff --git a/howdy/src/meson.build b/howdy/src/meson.build
+index 36dc05e..44207bb 100644
+--- a/howdy/src/meson.build
++++ b/howdy/src/meson.build
+@@ -33,6 +33,7 @@ py_sources = [
+     'paths_factory.py',
+     'recorders/__init__.py',
+     'recorders/ffmpeg_reader.py',
++    'recorders/msxu_reader.py',
+     'recorders/pyv4l2_reader.py',
+     'recorders/v4l2.py',
+     'recorders/video_capture.py',

@@ -1,0 +1,29 @@
+diff --git a/howdy/src/cli/test.py b/howdy/src/cli/test.py
+index f18c4eb..a6cb97f 100644
+--- a/howdy/src/cli/test.py
++++ b/howdy/src/cli/test.py
+@@ -19,7 +19,7 @@ from recorders.video_capture import VideoCapture
+ config = configparser.ConfigParser()
+ config.read(paths_factory.config_file_path())
+ 
+-if config.get("video", "recording_plugin", fallback="opencv") != "opencv":
++if config.get("video", "recording_plugin", fallback="opencv") not in ("opencv", "msxu"):
+ 	print(_("Howdy has been configured to use a recorder which doesn't support the test command yet, aborting"))
+ 	sys.exit(12)
+ 
+diff --git a/howdy/src/recorders/video_capture.py b/howdy/src/recorders/video_capture.py
+index 15888a5..9714d30 100644
+--- a/howdy/src/recorders/video_capture.py
++++ b/howdy/src/recorders/video_capture.py
+@@ -110,6 +110,11 @@ class VideoCapture:
+ 				self.config.get("video", "device_format", fallback="v4l2")
+ 			)
+ 
++		elif recording_plugin == "msxu":
++			# IR camera with MSXU frame illumination metadata (alternating flood light)
++			from recorders.msxu_reader import from_config
++			self.internal = from_config(self.config)
++
+ 		elif recording_plugin == "pyv4l2":
+ 			# Set the capture source for pyv4l2
+ 			from recorders.pyv4l2_reader import pyv4l2_reader
